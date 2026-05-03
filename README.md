@@ -1,90 +1,83 @@
+# Bank Marketing Campaign — Classifier Comparison
 
-# 📊 Comparing Classifiers on Bank Marketing Data
+Predicting whether a client will subscribe to a term deposit based on a Portuguese bank's direct marketing campaign data. This project benchmarks multiple classification algorithms and identifies the best-performing model for deployment.
 
-## 🧠 Business Understanding
+## Business Problem
 
-The goal of this project is to develop predictive models to identify whether a customer will subscribe to a term deposit, based on data collected from a series of telemarketing campaigns by a Portuguese banking institution. This information can help improve marketing efficiency, reduce campaign costs, and improve targeting strategies.
+Banks run costly phone-based marketing campaigns. Accurately predicting which clients are likely to subscribe to a term deposit allows the marketing team to:
+- Prioritize high-value leads and reduce call volume
+- Allocate resources more efficiently
+- Increase conversion rates while lowering cost-per-acquisition
 
----
+## Dataset
 
-## 📁 Dataset Overview
+| Attribute | Value |
+|---|---|
+| Source | UCI Machine Learning Repository |
+| Records | 41,188 clients |
+| Features | 20 (demographic, campaign, economic) |
+| Target | Binary — subscribed to term deposit (yes/no) |
+| Class imbalance | ~11.3% positive class |
 
-- **Records**: 41,188  
-- **Features**: 20 (excluding target)  
-- **Target variable**: `y` — whether the client subscribed to a term deposit (`yes` / `no`)  
-- **Source**: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Bank+Marketing)
+Key features: age, job, marital status, education, number of contacts, previous campaign outcome, economic indicators (employment rate, consumer price index).
 
----
+## Models Evaluated
 
-## 🧹 Preprocessing & Feature Engineering
+| Model | Train Accuracy | Test Accuracy | Train Time |
+|---|---|---|---|
+| Dummy Classifier (baseline) | 88.74% | 88.74% | — |
+| Logistic Regression | **90.36%** | **90.06%** | Fast |
+| Decision Tree | 91.82% | 85.21% | Fast |
+| K-Nearest Neighbors | 90.91% | 88.12% | Moderate |
+| SVM | 90.59% | 90.01% | Slow |
 
-- Removed `duration` feature due to data leakage.
-- Converted categorical features using one-hot encoding.
-- Treated `"unknown"` values as separate categories.
-- Encoded target variable: `yes` → 1, `no` → 0
-- Splitted data into train/test (80% / 20%)
-- Identified class imbalance: ~11% positive class
+**Winner: Logistic Regression** — best generalization, no overfitting, interpretable coefficients.
 
----
+## Methodology
 
-## 🔧 Baseline Model
+- **EDA** — Distribution analysis, correlation heatmaps, class imbalance assessment
+- **Preprocessing** — One-hot encoding for categoricals, StandardScaler for numerics, train/test split (80/20)
+- **Model selection** — GridSearchCV with cross-validation for hyperparameter tuning
+- **Evaluation** — Accuracy, precision, recall, F1-score, confusion matrix
 
-- **Model**: DummyClassifier (strategy = `'most_frequent'`)
-- **Baseline Accuracy**: `0.8874`
+## Key Findings
 
----
+1. **Previous campaign outcome** is the strongest predictor — clients who subscribed before are far more likely to do so again
+2. **Economic context matters** — employment rate and consumer confidence significantly influence subscription likelihood
+3. **Contact duration** is highly correlated with success, though it cannot be known before the call
+4. Logistic Regression matches SVM performance at a fraction of the computational cost
 
-## 🧪 Model Training (Default Settings)
+## Project Structure
 
-| Model                | Train Accuracy | Test Accuracy |
-|---------------------|----------------|----------------|
-| Logistic Regression | 0.9001         | 0.9006         |
-| Decision Tree       | 0.9000         | 0.9000         |
-| K-Nearest Neighbors | 0.9000         | 0.8967         |
+```
+bank-marketing-classifier-comparison/
+├── prompt_III.ipynb        # Full analysis notebook
+├── data/
+│   ├── bank-additional-full.csv   # Full dataset (41,188 records)
+│   └── bank-additional.csv        # Sampled dataset (4,119 records)
+└── CRISP-DM-BANK.pdf       # CRISP-DM methodology reference
+```
 
----
+## Quick Start
 
-## 🔍 Model Tuning (GridSearchCV)
+```bash
+git clone https://github.com/BedirhanUlas/bank-marketing-classifier-comparison.git
+cd bank-marketing-classifier-comparison
+pip install pandas numpy scikit-learn matplotlib seaborn jupyter
+jupyter notebook prompt_III.ipynb
+```
 
-### Decision Tree
-- Best Parameters:  
-  `max_depth=10`, `min_samples_split=2`
-- **F1 Macro Score**: 0.67
+## Tech Stack
 
-### K-Nearest Neighbors
-- Best `n_neighbors`: 9
-- **Test Accuracy**: 0.8967
+`Python` · `scikit-learn` · `pandas` · `NumPy` · `Matplotlib` · `Seaborn`
 
----
+## Future Improvements
 
-## 📊 Visualizations
+- Apply SMOTE or class weighting to address the 11.3% positive class imbalance
+- Evaluate ensemble methods (Random Forest, XGBoost) — expected significant gains
+- Build a FastAPI serving endpoint for real-time scoring
+- Feature engineering: interaction terms between economic indicators
 
-- Bar chart comparing classifier accuracy
-- Classification reports per model
-- Support counts for target classes
-- Confusion matrix (optional)
+## License
 
----
-
-## ✅ Key Findings
-
-- Logistic Regression performed best overall, with high accuracy and low overfitting.
-- Decision Trees offer interpretability but may struggle with class imbalance.
-- KNN underperformed slightly and may benefit from feature scaling.
-
----
-
-## 🚀 Recommendations
-
-- Try ensemble models (Random Forest, XGBoost).
-- Use SMOTE or class weights to improve performance on the minority class.
-- Monitor **recall** and **F1-score** instead of only accuracy.
-- Build an interpretable dashboard for marketing decision-makers.
-
----
-
-## 📌 Next Steps
-
-- Document findings for stakeholders.
-- Explore time-based model performance (by campaign month).
-- Consider cost-sensitive learning to prioritize positive class predictions.
+MIT
